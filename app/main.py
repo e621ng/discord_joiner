@@ -14,7 +14,7 @@ OAUTH2_CLIENT_ID = os.environ['OAUTH2_CLIENT_ID']
 OAUTH2_CLIENT_SECRET = os.environ['OAUTH2_CLIENT_SECRET']
 OAUTH2_REDIRECT_URI = 'https://discord.e621.net/callback'
 
-API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discordapp.com/api')
+API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discord.com/api')
 AUTHORIZATION_BASE_URL = API_BASE_URL + '/oauth2/authorize'
 TOKEN_URL = API_BASE_URL + '/oauth2/token'
 
@@ -159,6 +159,13 @@ def join():
                           'Contet-Type': 'application/json'},
                  json={'access_token': discord.access_token,
                        'nick': new_username})
+
+    print("Status code: %d" % join.status_code)
+    if join.status_code not in [200, 201, 204]:
+        print("WAT!?")
+        print(join.text)
+        session.clear()
+        abort(403)
     session.clear()
     get_db().commit()
     return "You have been joined to the server."

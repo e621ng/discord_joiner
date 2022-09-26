@@ -2,10 +2,10 @@ FROM alpine:edge
 
 RUN apk --update add \
 	--no-cache \
-	bash python3 uwsgi \
+	bash python3 py3-pip uwsgi \
 	uwsgi-python3 && \
 	pip3 install --upgrade pip && \
-	addgroup -S www-data && \
+#	addgroup -S www-data && \
 	adduser -S -g www-data www-data
 
 COPY ./app /opt/app
@@ -14,7 +14,7 @@ VOLUME /opt/app/db
 
 RUN pip3 install -r requirements.txt && chown -R www-data:www-data /opt/app
 
-ENV FETCH_SECRET=9874982374982hyniheinarisentioen343ast OAUTH2_CLIENT_ID=***REMOVED*** OAUTH2_CLIENT_SECRET=***REMOVED*** BOT_TOKEN="Bot ***REMOVED***" URL_SECRET="***REMOVED***"
+ENV FETCH_SECRET=***REMOVED*** OAUTH2_CLIENT_ID=***REMOVED*** OAUTH2_CLIENT_SECRET=***REMOVED*** BOT_TOKEN="Bot ***REMOVED***" URL_SECRET="***REMOVED***"
 
 EXPOSE 8000
 
