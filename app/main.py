@@ -14,6 +14,7 @@ OAUTH2_CLIENT_ID = os.environ['OAUTH2_CLIENT_ID']
 OAUTH2_CLIENT_SECRET = os.environ['OAUTH2_CLIENT_SECRET']
 OAUTH2_REDIRECT_URI = 'https://discord.e621.net/callback'
 
+FAILED_JOIN_URL = os.environ.get('FAILED_JOIN_URL', '')
 API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discord.com/api')
 AUTHORIZATION_BASE_URL = API_BASE_URL + '/oauth2/authorize'
 TOKEN_URL = API_BASE_URL + '/oauth2/token'
@@ -164,6 +165,9 @@ def join():
     if join.status_code not in [200, 201, 204]:
         print("WAT!?")
         print(join.text)
+        if FAILED_JOIN_URL:
+            requests.post(FAILED_JOIN_URL, headers={'Content-Type': 'application/json'},
+                json={'content': f"https://e621.net/users/{session['user_id']} tried to join as {user['id']}:{d_username} and got `{join.text}`"})
         session.clear()
         abort(403)
     session.clear()
