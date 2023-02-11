@@ -4,6 +4,14 @@ services:
   web:
     restart: always
     build: .
+    environment:
+      FETCH_SECRET: ${FETCH_SECRET}
+      OAUTH2_CLIENT_ID: ${OAUTH2_CLIENT_ID}
+      OAUTH2_CLIENT_SECRET: ${OAUTH2_CLIENT_SECRET}
+      BOT_TOKEN: ${BOT_TOKEN}
+      GUILD_ID: ${GUILD_ID}
+      URL_SECRET: ${URL_SECRET}
+      FAILED_JOIN_URL: ${FAILED_JOIN_URL}
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
