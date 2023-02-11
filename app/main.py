@@ -20,6 +20,7 @@ AUTHORIZATION_BASE_URL = API_BASE_URL + '/oauth2/authorize'
 TOKEN_URL = API_BASE_URL + '/oauth2/token'
 
 BOT_TOKEN = os.environ['BOT_TOKEN']
+GUILD_ID = os.environ['GUILD_ID']
 LINK_SECRET = os.environ['URL_SECRET']
 FETCH_SECRET = os.environ['FETCH_SECRET']
 
@@ -29,7 +30,6 @@ app.config['SECRET_KEY'] = OAUTH2_CLIENT_SECRET
 
 if 'http://' in OAUTH2_REDIRECT_URI:
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
-
 
 def token_updater(token):
     session['oauth2_token'] = token
@@ -155,7 +155,7 @@ def join():
     cur = get_db().cursor()
     d_username = user['username'] + '#' + user['discriminator']
     cur.execute('INSERT INTO discord_names(user_id, discord_id, discord_username) VALUES (?, ?, ?)', (session['user_id'], user['id'], d_username))
-    join = requests.put(API_BASE_URL + '/guilds/431908090883997698/members/' + user['id'],
+    join = requests.put(f"{API_BASE_URL}/guilds/{GUILD_ID}/members/{user['id']}",
                  headers={'Authorization': BOT_TOKEN,
                           'Contet-Type': 'application/json'},
                  json={'access_token': discord.access_token,
@@ -176,4 +176,3 @@ def join():
 
 if __name__ == '__main__':
     app.run()
-
