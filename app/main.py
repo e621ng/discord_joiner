@@ -12,7 +12,7 @@ DB_PATH = '/opt/app/db/db.db'
 
 OAUTH2_CLIENT_ID = os.environ['OAUTH2_CLIENT_ID']
 OAUTH2_CLIENT_SECRET = os.environ['OAUTH2_CLIENT_SECRET']
-OAUTH2_REDIRECT_URI = 'https://discord.e621.net/callback'
+OAUTH2_REDIRECT_URI = os.environ['JOINER_BASE_URL'] + '/callback'
 
 FAILED_JOIN_URL = os.environ.get('FAILED_JOIN_URL', '')
 API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discord.com/api')
