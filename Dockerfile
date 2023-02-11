@@ -14,8 +14,6 @@ VOLUME /opt/app/db
 
 RUN pip3 install -r requirements.txt && chown -R www-data:www-data /opt/app
 
-ENV FETCH_SECRET=***REMOVED*** OAUTH2_CLIENT_ID=***REMOVED*** OAUTH2_CLIENT_SECRET=***REMOVED*** BOT_TOKEN="Bot ***REMOVED***" URL_SECRET="***REMOVED***" FAILED_JOIN_URL="https://discord.com/api/webhooks/***REMOVED***/***REMOVED***"
-
 EXPOSE 8000
 
 CMD ["uwsgi", "--ini", "/opt/app/uwsgi.ini"]
