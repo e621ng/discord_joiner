@@ -156,7 +156,7 @@ def join():
     d_username = user['username'] + '#' + user['discriminator']
     cur.execute('INSERT INTO discord_names(user_id, discord_id, discord_username) VALUES (?, ?, ?)', (session['user_id'], user['id'], d_username))
     join = requests.put(f"{API_BASE_URL}/guilds/{GUILD_ID}/members/{user['id']}",
-                 headers={'Authorization': BOT_TOKEN,
+                 headers={'Authorization': f'Bot {BOT_TOKEN}',
                           'Contet-Type': 'application/json'},
                  json={'access_token': discord.access_token,
                        'nick': new_username})
