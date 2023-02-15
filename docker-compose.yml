@@ -5,14 +5,14 @@ services:
     restart: always
     build: .
     environment:
-      FETCH_SECRET: ${FETCH_SECRET}
-      OAUTH2_CLIENT_ID: ${OAUTH2_CLIENT_ID}
-      OAUTH2_CLIENT_SECRET: ${OAUTH2_CLIENT_SECRET}
-      JOINER_BASE_URL: ${JOINER_BASE_URL}
-      BOT_TOKEN: ${BOT_TOKEN}
-      GUILD_ID: ${GUILD_ID}
-      URL_SECRET: ${URL_SECRET}
-      FAILED_JOIN_URL: ${FAILED_JOIN_URL}
+      FETCH_SECRET: ${FETCH_SECRET:?}
+      OAUTH2_CLIENT_ID: ${OAUTH2_CLIENT_ID:?}
+      OAUTH2_CLIENT_SECRET: ${OAUTH2_CLIENT_SECRET:?}
+      JOINER_BASE_URL: ${JOINER_BASE_URL:?}
+      BOT_TOKEN: ${BOT_TOKEN:?}
+      GUILD_ID: ${GUILD_ID:?}
+      URL_SECRET: ${URL_SECRET:?}
+      FAILED_JOIN_URL: ${FAILED_JOIN_URL:?}
     ports:
       - "8000:8000"
     volumes:
