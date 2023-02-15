@@ -170,6 +170,10 @@ def join():
                 json={'content': f"https://e621.net/users/{session['user_id']} tried to join as {user['id']}:{d_username} and got `{join.text}`"})
         session.clear()
         abort(403)
+    revoke = requests.post(f'{API_BASE_URL}/oauth2/token/revoke', headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                data={'client_id': OAUTH2_CLIENT_ID, 'client_secret': OAUTH2_CLIENT_SECRET, 'token': discord.access_token})
+    if revoke.status_code not in [200, 201, 204]:
+        print(f"Failed to revoke token: {response.status} {response.text}")
     session.clear()
     get_db().commit()
     return "You have been joined to the server."
