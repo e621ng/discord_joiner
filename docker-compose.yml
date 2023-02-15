@@ -14,9 +14,6 @@ services:
       URL_SECRET: ${URL_SECRET}
       FAILED_JOIN_URL: ${FAILED_JOIN_URL}
     ports:
-      - "127.0.0.1:8000:8000"
+      - "8000:8000"
     volumes:
-      - db_data:/opt/app/db
-
-volumes:
-  db_data: {}
+      - ${PWD}/users.db:/opt/app/db/users.db

@@ -3,16 +3,12 @@ from flask import Flask, g, session, redirect, request, url_for, jsonify, abort
 from requests_oauthlib import OAuth2Session
 import requests
 import sqlite3
-import shutil
 
 import time
 
 from hashlib import sha256
 
-DB_PATH = '/opt/app/db/db.db'
-if not os.path.exists(DB_PATH):
-    print('Database file missing, copying initial data')
-    shutil.copy('initial.db', DB_PATH)
+DB_PATH = '/opt/app/db/users.db'
 
 OAUTH2_CLIENT_ID = os.environ['OAUTH2_CLIENT_ID']
 OAUTH2_CLIENT_SECRET = os.environ['OAUTH2_CLIENT_SECRET']
