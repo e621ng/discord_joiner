@@ -152,7 +152,6 @@ def join():
         print(user)
         abort(403)
 
-    print(type(user['id']))
     new_username = session.get('username').replace('_', ' ')
     cur = get_db().cursor()
     d_username = user['username'] + '#' + user['discriminator']
@@ -165,8 +164,6 @@ def join():
 
     print("Status code: %d" % join.status_code)
     if join.status_code not in [200, 201, 204]:
-        print("WAT!?")
-        print(join.text)
         if FAILED_JOIN_URL:
             created_at = math.floor(((user['id'] >> 22) + 1420070400000) / 1000)
             requests.post(FAILED_JOIN_URL, headers={'Content-Type': 'application/json'},
