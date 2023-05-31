@@ -3,6 +3,7 @@ from flask import Flask, g, session, redirect, request, url_for, jsonify, abort
 from requests_oauthlib import OAuth2Session
 import requests
 import sqlite3
+import math
 
 import time
 
@@ -151,6 +152,7 @@ def join():
         print(user)
         abort(403)
 
+    print(type(user['id']))
     new_username = session.get('username').replace('_', ' ')
     cur = get_db().cursor()
     d_username = user['username'] + '#' + user['discriminator']
@@ -166,8 +168,9 @@ def join():
         print("WAT!?")
         print(join.text)
         if FAILED_JOIN_URL:
+            created_at = math.floor(((user['id'] >> 22) + 1420070400000) / 1000)
             requests.post(FAILED_JOIN_URL, headers={'Content-Type': 'application/json'},
-                json={'content': f"https://e621.net/users/{session['user_id']} tried to join as {user['id']}:{d_username} and got `{join.text}`"})
+                json={'content': f"https://e621.net/users/{session['user_id']} tried to join as {user['id']}:{d_username} (<t:{created_at}:d>) and got `{join.text}`"})
         session.clear()
         abort(403)
     revoke = requests.post(f'{API_BASE_URL}/oauth2/token/revoke', headers={'Content-Type': 'application/x-www-form-urlencoded'},
