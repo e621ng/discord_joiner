@@ -166,7 +166,7 @@ def join():
     print("Status code: %d" % join.status_code)
     if join.status_code not in [200, 201, 204]:
         if FAILED_JOIN_URL:
-            created_at = math.floor(((user['id'] >> 22) + 1420070400000) / 1000)
+            created_at = math.floor(((int(user['id']) >> 22) + 1420070400000) / 1000)
             requests.post(FAILED_JOIN_URL, headers={'Content-Type': 'application/json'},
                 json={'content': f"https://e621.net/users/{session['user_id']} tried to join as {user['id']}:{d_username} (<t:{created_at}:d>) and got `{join.text}`"})
         session.clear()
