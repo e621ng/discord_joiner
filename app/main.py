@@ -156,6 +156,7 @@ def join():
     cur = get_db().cursor()
     d_username = user['username'] + '#' + user['discriminator']
     cur.execute('INSERT INTO discord_names(user_id, discord_id, discord_username) VALUES (?, ?, ?)', (session['user_id'], user['id'], d_username))
+    get_db().commit()
     join = requests.put(f"{API_BASE_URL}/guilds/{GUILD_ID}/members/{user['id']}",
                  headers={'Authorization': f'Bot {BOT_TOKEN}',
                           'Contet-Type': 'application/json'},
@@ -175,7 +176,6 @@ def join():
     if revoke.status_code not in [200, 201, 204]:
         print(f"Failed to revoke token: {response.status} {response.text}")
     session.clear()
-    get_db().commit()
     return "You have been joined to the server."
 
 if __name__ == '__main__':
