@@ -154,7 +154,11 @@ def join():
 
     new_username = session.get('username').replace('_', ' ')
     cur = get_db().cursor()
-    d_username = user['username'] + '#' + user['discriminator']
+    if user['discriminator'] == '0':
+        d_username = user['username']
+    else:
+        user['username'] + '#' + user['discriminator']
+
     cur.execute('INSERT INTO discord_names(user_id, discord_id, discord_username) VALUES (?, ?, ?)', (session['user_id'], user['id'], d_username))
     get_db().commit()
     join = requests.put(f"{API_BASE_URL}/guilds/{GUILD_ID}/members/{user['id']}",
