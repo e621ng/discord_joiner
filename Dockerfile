@@ -1,4 +1,4 @@
-FROM alpine:3.17
+FROM alpine:3.18
 
 RUN apk --update add \
 	--no-cache \
@@ -6,9 +6,10 @@ RUN apk --update add \
 	uwsgi-python3 && \
 	pip3 install --upgrade pip
 
-COPY ./app /opt/app
-WORKDIR /opt/app
 
+WORKDIR /opt/app
+COPY ./app/requirements.txt /opt/app/requirements.txt
 RUN pip3 install -r requirements.txt
+COPY ./app /opt/app
 
 CMD ["uwsgi", "--ini", "/opt/app/uwsgi.ini"]

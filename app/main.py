@@ -1,5 +1,5 @@
 import os
-from flask import Flask, g, session, redirect, request, url_for, jsonify, abort
+from flask import Flask, g, session, redirect, request, url_for, jsonify, abort, render_template
 from requests_oauthlib import OAuth2Session
 import requests
 import sqlite3
@@ -101,10 +101,8 @@ def index():
     auth = request.args.get('hash', None)
     if not username or not user_id or not auth or not t2:
         abort(400)
-    print(int(t2), int(time.time()))
     if int(time.time()) > int(t2):
-        print("time has expired")
-        abort(403)
+        abort(403, f'You took too long to authorize the request. Please try again.')
     auth_string = "{} {} {} {}".format(username, user_id, t2, LINK_SECRET).encode('utf-8')
     if sha256(auth_string).hexdigest() != auth:
         print('bad auth {} {}'.format(auth, sha256(auth_string).hexdigest()))
@@ -167,20 +165,45 @@ def join():
                  json={'access_token': discord.access_token,
                        'nick': new_username})
 
-    print("Status code: %d" % join.status_code)
-    if join.status_code not in [200, 201, 204]:
-        if FAILED_JOIN_URL:
-            created_at = math.floor(((int(user['id']) >> 22) + 1420070400000) / 1000)
-            requests.post(FAILED_JOIN_URL, headers={'Content-Type': 'application/json'},
-                json={'content': f"https://e621.net/users/{session['user_id']} tried to join as {user['id']}:{d_username} (<t:{created_at}:d>) and got `{join.text}`"})
-        session.clear()
-        abort(403)
     revoke = requests.post(f'{API_BASE_URL}/oauth2/token/revoke', headers={'Content-Type': 'application/x-www-form-urlencoded'},
                 data={'client_id': OAUTH2_CLIENT_ID, 'client_secret': OAUTH2_CLIENT_SECRET, 'token': discord.access_token})
     if revoke.status_code not in [200, 201, 204]:
         print(f"Failed to revoke token: {response.status} {response.text}")
+
+    if join.status_code not in [200, 201, 204]:
+        created_at = math.floor(((int(user['id']) >> 22) + 1420070400000) / 1000)
+        requests.post(FAILED_JOIN_URL, headers={'Content-Type': 'application/json'},
+            json={'content': f"https://e621.net/users/{session['user_id']} tried to join as {user['id']}:{d_username} (<t:{created_at}:d>) and got `{join.text}`"})
+        session.clear()
+        response = join.json()
+        abort(403, friendly_discord_error(response['code']))
+
     session.clear()
-    return "You have been joined to the server."
+    return render_template('page.html', title='Success', message=f'You have been added to the server. <a href="https://discord.com/channels/{GUILD_ID}">See you there.</a>'), 200
+
+def friendly_discord_error(code):
+    # https://discord.com/developers/docs/topics/opcodes-and-status-codes#json
+    match code:
+        case 30001:
+            return 'You are at the discord server limit. Try again after you have left some servers.'
+        case 40069:
+            return 'Invites for our discord server are currently disabled. Try again at a later date.'
+        case 40007:
+            return 'You are banned from the e621 discord server. You may appeal this ban by writing an email to management@e621.net.'
+        case _:
+            return 'An unknown error occurred.'
+
+@app.errorhandler(400)
+def bad_request(message):
+    return render_template('page.html', title='Bad Request', message=str(message)), 400
+
+@app.errorhandler(403)
+def forbidden(message):
+    return render_template('page.html', title='Forbidden', message=str(message)), 403
+
+@app.errorhandler(404)
+def not_found(message):
+    return render_template('page.html', title='Not Found', message=str(message)), 404
 
 if __name__ == '__main__':
     app.run()
