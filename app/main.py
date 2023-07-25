@@ -103,7 +103,7 @@ def index():
         abort(400)
     print(int(t2), int(time.time()))
     if int(time.time()) > int(t2):
-        abort(403, "You took too long to authorize the request. Please <a href=""javascript:window.history.back()"">try again</a>.")
+        abort(403, "You took too long to authorize the request. Please <a href=""https://621.net/static/discord"">try again</a>.")
     auth_string = "{} {} {} {}".format(username, user_id, t2, LINK_SECRET).encode('utf-8')
     if sha256(auth_string).hexdigest() != auth:
         print('bad auth {} {}'.format(auth, sha256(auth_string).hexdigest()))
