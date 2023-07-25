@@ -103,8 +103,7 @@ def index():
         abort(400)
     print(int(t2), int(time.time()))
     if int(time.time()) > int(t2):
-        print("time has expired")
-        abort(403)
+        abort(403, "You took too long to authorize the request. Please <a href=""javascript:window.history.back()"">try again</a>.")
     auth_string = "{} {} {} {}".format(username, user_id, t2, LINK_SECRET).encode('utf-8')
     if sha256(auth_string).hexdigest() != auth:
         print('bad auth {} {}'.format(auth, sha256(auth_string).hexdigest()))
@@ -191,7 +190,7 @@ def join():
     if revoke.status_code not in [200, 201, 204]:
         print(f"Failed to revoke token: {response.status} {response.text}")
     session.clear()
-    return render_template('page.html', title="Success", message="You have been added to the server. <a href=""https://discord.com/channels/431908090883997698"">See you there.</a>", html=True), 200
+    return render_template('page.html', title="Success", message="You have been added to the server. <a href=""https://discord.com/channels/431908090883997698"">See you there.</a>"), 200
 
 @app.errorhandler(400)
 def bad_request(message):
@@ -203,6 +202,7 @@ def forbidden(message):
 
 @app.errorhandler(404)
 def not_found(message):
+    print(request.url)
     return render_template('page.html', title="Not Found", message=str(message)), 404
 
 if __name__ == '__main__':
