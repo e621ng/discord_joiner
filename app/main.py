@@ -19,6 +19,8 @@ FAILED_JOIN_URL = os.environ.get('FAILED_JOIN_URL', '')
 API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discord.com/api')
 AUTHORIZATION_BASE_URL = API_BASE_URL + '/oauth2/authorize'
 TOKEN_URL = API_BASE_URL + '/oauth2/token'
+E621_STATIC_URL = "https://e621.net/static/discord"
+SERVER_URL = "https://discord.com/channels/431908090883997698"
 
 BOT_TOKEN = os.environ['BOT_TOKEN']
 GUILD_ID = os.environ['GUILD_ID']
@@ -100,10 +102,10 @@ def index():
     t2 = request.args.get('time', None)
     auth = request.args.get('hash', None)
     if not username or not user_id or not auth or not t2:
-        abort(400)
+        return redirect(E621_STATIC_URL)
     print(int(t2), int(time.time()))
     if int(time.time()) > int(t2):
-        abort(403, "You took too long to authorize the request. Please <a href=""https://621.net/static/discord"">try again</a>.")
+        abort(403, f"You took too long to authorize the request. Please <a href=\"{E621_STATIC_URL}\">try again</a>.")
     auth_string = "{} {} {} {}".format(username, user_id, t2, LINK_SECRET).encode('utf-8')
     if sha256(auth_string).hexdigest() != auth:
         print('bad auth {} {}'.format(auth, sha256(auth_string).hexdigest()))
@@ -190,7 +192,7 @@ def join():
     if revoke.status_code not in [200, 201, 204]:
         print(f"Failed to revoke token: {response.status} {response.text}")
     session.clear()
-    return render_template('page.html', title="Success", message="You have been added to the server. <a href=""https://discord.com/channels/431908090883997698"">See you there.</a>"), 200
+    return render_template('page.html', title="Success", message=f"You have been added to the server. <a href=\"{SERVER_URL}\">See you there.</a>"), 200
 
 @app.errorhandler(400)
 def bad_request(message):
