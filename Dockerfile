@@ -1,10 +1,10 @@
 FROM alpine:3.17
 
 RUN apk --update add \
-    --no-cache \
-    bash python3 py3-pip uwsgi \
-    uwsgi-python3 && \
-    pip3 install --upgrade pip
+	--no-cache \
+	bash python3 py3-pip uwsgi \
+	uwsgi-python3 && \
+	pip3 install --upgrade pip
 
 
 WORKDIR /opt/app
