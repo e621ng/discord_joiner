@@ -101,7 +101,6 @@ def index():
     auth = request.args.get('hash', None)
     if not username or not user_id or not auth or not t2:
         abort(400)
-    print(int(t2), int(time.time()))
     if int(time.time()) > int(t2):
         abort(403, f'You took too long to authorize the request. Please try again.')
     auth_string = "{} {} {} {}".format(username, user_id, t2, LINK_SECRET).encode('utf-8')
@@ -171,7 +170,6 @@ def join():
     if revoke.status_code not in [200, 201, 204]:
         print(f"Failed to revoke token: {response.status} {response.text}")
 
-    print("Status code: %d" % join.status_code)
     if join.status_code not in [200, 201, 204]:
         created_at = math.floor(((int(user['id']) >> 22) + 1420070400000) / 1000)
         requests.post(FAILED_JOIN_URL, headers={'Content-Type': 'application/json'},
@@ -205,7 +203,6 @@ def forbidden(message):
 
 @app.errorhandler(404)
 def not_found(message):
-    print(request.url)
     return render_template('page.html', title='Not Found', message=str(message)), 404
 
 if __name__ == '__main__':
