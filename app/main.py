@@ -19,8 +19,8 @@ FAILED_JOIN_URL = os.environ.get('FAILED_JOIN_URL', '')
 API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discord.com/api')
 AUTHORIZATION_BASE_URL = API_BASE_URL + '/oauth2/authorize'
 TOKEN_URL = API_BASE_URL + '/oauth2/token'
-E621_STATIC_URL = "https://e621.net/static/discord"
-SERVER_URL = "https://discord.com/channels/431908090883997698"
+SERVER_GUILD_ID = '431908090883997698'
+SERVER_WELCOME_CHANNEL_ID = '996134475161423992'
 
 BOT_TOKEN = os.environ['BOT_TOKEN']
 GUILD_ID = os.environ['GUILD_ID']
@@ -102,10 +102,10 @@ def index():
     t2 = request.args.get('time', None)
     auth = request.args.get('hash', None)
     if not username or not user_id or not auth or not t2:
-        return redirect(E621_STATIC_URL)
+        abort(400)
     print(int(t2), int(time.time()))
     if int(time.time()) > int(t2):
-        abort(403, f'You took too long to authorize the request. Please <a href="{E621_STATIC_URL}">try again</a>.')
+        abort(403, f'You took too long to authorize the request. Please try again.')
     auth_string = "{} {} {} {}".format(username, user_id, t2, LINK_SECRET).encode('utf-8')
     if sha256(auth_string).hexdigest() != auth:
         print('bad auth {} {}'.format(auth, sha256(auth_string).hexdigest()))
@@ -170,42 +170,43 @@ def join():
 
     print("Status code: %d" % join.status_code)
     if join.status_code not in [200, 201, 204]:
-        if FAILED_JOIN_URL:
-            created_at = math.floor(((int(user['id']) >> 22) + 1420070400000) / 1000)
-            requests.post(FAILED_JOIN_URL, headers={'Content-Type': 'application/json'},
-                json={'content': f"https://e621.net/users/{session['user_id']} tried to join as {user['id']}:{d_username} (<t:{created_at}:d>) and got `{join.text}`"})
+        created_at = math.floor(((int(user['id']) >> 22) + 1420070400000) / 1000)
+        requests.post(FAILED_JOIN_URL, headers={'Content-Type': 'application/json'},
+            json={'content': f"https://e621.net/users/{session['user_id']} tried to join as {user['id']}:{d_username} (<t:{created_at}:d>) and got `{join.text}`"})
         session.clear()
         response = join.json()
-        message = "An unknown error occurred."
-        # https://discord.com/developers/docs/topics/opcodes-and-status-codes#json
-        if "code" in response:
-            # 30001 = Maximum number of guilds reached
-            # 40069 = Invites paused
-            if response['code'] in [30001, 40069]:
-                message = response['message']
-            # 40007 = The user is banned from this guild
-            elif response['code'] == 40007:
-                message = "You are banned from this server. You can appeal this ban by emailing management@e621.net."
-        abort(403, message)
+        abort(403, friendly_discord_error(response['code']))
     revoke = requests.post(f'{API_BASE_URL}/oauth2/token/revoke', headers={'Content-Type': 'application/x-www-form-urlencoded'},
                 data={'client_id': OAUTH2_CLIENT_ID, 'client_secret': OAUTH2_CLIENT_SECRET, 'token': discord.access_token})
     if revoke.status_code not in [200, 201, 204]:
         print(f"Failed to revoke token: {response.status} {response.text}")
     session.clear()
-    return render_template('page.html', title="Success", message=f'You have been added to the server. <a href="{SERVER_URL}">See you there.</a>'), 200
+    return render_template('page.html', title="Success", message=f'You have been added to the server. <a href="https://discord.com/channels/{SERVER_GUILD_ID}/{SERVER_WELCOME_CHANNEL_ID}">See you there.</a>'), 200
+
+def friendly_discord_error(code):
+    # https://discord.com/developers/docs/topics/opcodes-and-status-codes#json
+    match code:
+        case 30001:
+            return 'You are at the discord server limit. Try again after you have left some servers.'
+        case 40069:
+            return 'Invites for our discord server are currently disabled. Try again at a later date.'
+        case 40007:
+            return 'You are banned from the e621 discord server. You may appeal this ban by writing an email to management@e621.net.'
+        case _:
+            return 'An unknown error occurred.'
 
 @app.errorhandler(400)
 def bad_request(message):
-    return render_template('page.html', title="Bad Request", message=str(message)), 400
+    return render_template('page.html', title='Bad Request', message=str(message)), 400
 
 @app.errorhandler(403)
 def forbidden(message):
-    return render_template('page.html', title="Forbidden", message=str(message)), 403
+    return render_template('page.html', title='Forbidden', message=str(message)), 403
 
 @app.errorhandler(404)
 def not_found(message):
     print(request.url)
-    return render_template('page.html', title="Not Found", message=str(message)), 404
+    return render_template('page.html', title='Not Found', message=str(message)), 404
 
 if __name__ == '__main__':
     app.run()
