@@ -194,7 +194,7 @@ def join():
     return render_template('page.html', title="Success", message="You have been added to the server. <a href=""https://discord.com/channels/431908090883997698"">See you there.</a>", html=True), 200
 
 @app.errorhandler(400)
-def forbidden(message):
+def bad_request(message):
     return render_template('page.html', title="Bad Request", message=str(message)), 400
 
 @app.errorhandler(403)
@@ -202,7 +202,7 @@ def forbidden(message):
     return render_template('page.html', title="Forbidden", message=str(message)), 403
 
 @app.errorhandler(404)
-def forbidden(message):
+def not_found(message):
     return render_template('page.html', title="Not Found", message=str(message)), 404
 
 if __name__ == '__main__':
