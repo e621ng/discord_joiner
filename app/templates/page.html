@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <title>{{ title }}</title>
+    <style>
+        body {
+            background-color: #012e56;
+            color: #fff;
+        }
+
+        a {
+            color: #b4c7d9;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #e9f2fa;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>{{ title }}</h1>
+    {% if html %}
+    <p>{{ message|safe }}</p>
+    {% else %}
+    <p>{{ message }}</p>
+    {% endif %}
+</body>
+
+</html>

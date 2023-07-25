@@ -1,5 +1,5 @@
 import os
-from flask import Flask, g, session, redirect, request, url_for, jsonify, abort
+from flask import Flask, g, session, redirect, request, url_for, jsonify, abort, render_template
 from requests_oauthlib import OAuth2Session
 import requests
 import sqlite3
@@ -174,13 +174,36 @@ def join():
             requests.post(FAILED_JOIN_URL, headers={'Content-Type': 'application/json'},
                 json={'content': f"https://e621.net/users/{session['user_id']} tried to join as {user['id']}:{d_username} (<t:{created_at}:d>) and got `{join.text}`"})
         session.clear()
-        abort(403)
+        response = join.json()
+        message = "An unknown error occurred."
+        # https://discord.com/developers/docs/topics/opcodes-and-status-codes#json
+        if "code" in response:
+            # 30001 = Maximum number of guilds reached
+            # 40069 = Invites paused
+            if response['code'] in [30001, 40069]:
+                message = response['message']
+            # 40007 = The user is banned from this guild
+            elif response['code'] == 40007:
+                message = "You are banned from this server. You can appeal this ban by emailing management@e621.net."
+        abort(403, message)
     revoke = requests.post(f'{API_BASE_URL}/oauth2/token/revoke', headers={'Content-Type': 'application/x-www-form-urlencoded'},
                 data={'client_id': OAUTH2_CLIENT_ID, 'client_secret': OAUTH2_CLIENT_SECRET, 'token': discord.access_token})
     if revoke.status_code not in [200, 201, 204]:
         print(f"Failed to revoke token: {response.status} {response.text}")
     session.clear()
-    return "You have been joined to the server."
+    return render_template('page.html', title="Success", message="You have been added to the server. <a href=""https://discord.com/channels/431908090883997698"">See you there.</a>", html=True), 200
+
+@app.errorhandler(400)
+def forbidden(message):
+    return render_template('page.html', title="Bad Request", message=str(message)), 400
+
+@app.errorhandler(403)
+def forbidden(message):
+    return render_template('page.html', title="Forbidden", message=str(message)), 403
+
+@app.errorhandler(404)
+def forbidden(message):
+    return render_template('page.html', title="Not Found", message=str(message)), 404
 
 if __name__ == '__main__':
     app.run()
