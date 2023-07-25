@@ -168,6 +168,11 @@ def join():
                  json={'access_token': discord.access_token,
                        'nick': new_username})
 
+    revoke = requests.post(f'{API_BASE_URL}/oauth2/token/revoke', headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                data={'client_id': OAUTH2_CLIENT_ID, 'client_secret': OAUTH2_CLIENT_SECRET, 'token': discord.access_token})
+    if revoke.status_code not in [200, 201, 204]:
+        print(f"Failed to revoke token: {response.status} {response.text}")
+
     print("Status code: %d" % join.status_code)
     if join.status_code not in [200, 201, 204]:
         created_at = math.floor(((int(user['id']) >> 22) + 1420070400000) / 1000)
@@ -176,10 +181,7 @@ def join():
         session.clear()
         response = join.json()
         abort(403, friendly_discord_error(response['code']))
-    revoke = requests.post(f'{API_BASE_URL}/oauth2/token/revoke', headers={'Content-Type': 'application/x-www-form-urlencoded'},
-                data={'client_id': OAUTH2_CLIENT_ID, 'client_secret': OAUTH2_CLIENT_SECRET, 'token': discord.access_token})
-    if revoke.status_code not in [200, 201, 204]:
-        print(f"Failed to revoke token: {response.status} {response.text}")
+
     session.clear()
     return render_template('page.html', title="Success", message=f'You have been added to the server. <a href="https://discord.com/channels/{SERVER_GUILD_ID}/{SERVER_WELCOME_CHANNEL_ID}">See you there.</a>'), 200
 
