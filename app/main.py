@@ -19,8 +19,6 @@ FAILED_JOIN_URL = os.environ.get('FAILED_JOIN_URL', '')
 API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discord.com/api')
 AUTHORIZATION_BASE_URL = API_BASE_URL + '/oauth2/authorize'
 TOKEN_URL = API_BASE_URL + '/oauth2/token'
-SERVER_GUILD_ID = '431908090883997698'
-SERVER_WELCOME_CHANNEL_ID = '996134475161423992'
 
 BOT_TOKEN = os.environ['BOT_TOKEN']
 GUILD_ID = os.environ['GUILD_ID']
@@ -183,7 +181,7 @@ def join():
         abort(403, friendly_discord_error(response['code']))
 
     session.clear()
-    return render_template('page.html', title="Success", message=f'You have been added to the server. <a href="https://discord.com/channels/{SERVER_GUILD_ID}/{SERVER_WELCOME_CHANNEL_ID}">See you there.</a>'), 200
+    return render_template('page.html', title="Success", message=f'You have been added to the server. <a href="https://discord.com/channels/{GUILD_ID}">See you there.</a>'), 200
 
 def friendly_discord_error(code):
     # https://discord.com/developers/docs/topics/opcodes-and-status-codes#json
