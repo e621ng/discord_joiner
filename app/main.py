@@ -189,7 +189,9 @@ def friendly_discord_error(code):
         case 40069:
             return 'Invites for our discord server are currently disabled. Try again at a later date.'
         case 40007:
-            return 'You are banned from the e621 discord server. You may appeal this ban by writing an email to management@e621.net.'
+            return 'You are either IP banned by discord (are you using a VPN?) or banned from the server. Server bans may be appealed by writing an email to management@e621.net.'
+        case 20024:
+            return 'Could not add you to the server. Make sure you are able to access other NSFW-marked servers on your discord client.'
         case _:
             return 'An unknown error occurred.'
 
