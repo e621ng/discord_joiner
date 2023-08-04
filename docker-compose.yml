@@ -13,6 +13,7 @@ services:
       GUILD_ID: ${GUILD_ID:?}
       URL_SECRET: ${URL_SECRET:?}
       FAILED_JOIN_URL: ${FAILED_JOIN_URL:?}
+    user: ${UID:?}:${GID:?}
     ports:
       - "8000:8000"
     volumes:
