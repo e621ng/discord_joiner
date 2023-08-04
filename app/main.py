@@ -140,13 +140,6 @@ def callback():
     session['oauth2_token'] = token
     return redirect(url_for('.join'))
 
-
-@app.route('/me')
-def me():
-    discord = make_session(token=session.get('oauth2_token'))
-    user = discord.get(API_BASE_URL + '/users/@me').json()
-    return jsonify(user=user)
-
 @app.route('/join')
 def join():
     token = session.get('oauth2_token')
