@@ -131,7 +131,10 @@ def index():
 @app.route('/callback')
 def callback():
     if request.values.get('error'):
-        return request.values['error']
+        abort(400, request.values.get('error'))
+    if 'oauth2_state' not in session:
+        abort(403)
+
     discord = make_session(state=session.get('oauth2_state'))
     token = discord.fetch_token(
         TOKEN_URL,
