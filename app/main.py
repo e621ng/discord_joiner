@@ -9,7 +9,16 @@ import time
 
 from hashlib import sha256
 
-DB_PATH = '/opt/app/db/users.db'
+DB_PATH = '/opt/app/data/users.db'
+DB_SCHEMA = '''
+    CREATE TABLE IF NOT EXISTS discord_names (
+        id INTEGER PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        discord_id VARCHAR(128) NOT NULL,
+        discord_username VARCHAR(128) NOT NULL,
+        added_on datetime NOT NULL DEFAULT (datetime('now', 'localtime'))
+    )
+'''
 
 OAUTH2_CLIENT_ID = os.environ['OAUTH2_CLIENT_ID']
 OAUTH2_CLIENT_SECRET = os.environ['OAUTH2_CLIENT_SECRET']
@@ -62,6 +71,10 @@ def close_connection(excpetion):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+
+with app.app_context():
+    db = get_db()
+    db.cursor().execute(DB_SCHEMA)
 
 @app.route('/ids')
 def ids():

@@ -16,4 +16,4 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ${PWD}/users.db:/opt/app/db/users.db
+      - ./data:/opt/app/data
