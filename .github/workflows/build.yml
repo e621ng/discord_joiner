@@ -15,4 +15,5 @@ jobs:
     if: github.repository_owner == 'e621ng'
 
     steps:
-      - uses: e621ng/e621ng/.github/docker-build-and-push@master
+      - name: Publish to ghcr
+        uses: e621ng/publish-to-ghcr@v1
