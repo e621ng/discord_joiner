@@ -86,7 +86,7 @@ def ids():
     if sha256(auth_string).hexdigest() != auth:
         abort(403)
     cur = get_db().cursor()
-    cur.execute('SELECT discord_id FROM discord_names WHERE user_id = ?', (id,))
+    cur.execute('SELECT DISTINCT discord_id FROM discord_names WHERE user_id = ?', (id,))
     results = cur.fetchall()
     results = [x[0] for x in results]
     return jsonify(ids=results)
@@ -101,7 +101,7 @@ def e6ids():
     if sha256(auth_string).hexdigest() != auth:
         abort(403)
     cur = get_db().cursor()
-    cur.execute('SELECT user_id FROM discord_names WHERE discord_id = ?', (id,))
+    cur.execute('SELECT DISTINCT user_id FROM discord_names WHERE discord_id = ?', (id,))
     results = cur.fetchall()
     results = [x[0] for x in results]
     return jsonify(ids=results)
